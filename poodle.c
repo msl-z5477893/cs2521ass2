@@ -1,3 +1,6 @@
+// poodle.c
+// Assignment 2 main source file.
+// completed by Michael Stephen Lape (z5477893)
 
 #include <assert.h>
 #include <stdbool.h>
@@ -14,10 +17,7 @@
  * given a path of computers, assess that it works and the time taken
  * to probe it
  *
- * STATUS: BROKEN
- * - Fails task 4 for the following reason:
- * - if a single computer is visited multiple times in it's lifetime
- *   then its poodle time must be ignored.
+ * STATUS: UNOPTIMISED (slowed on challenge tasks)
  *
  * - Fails challenge test for the following reason:
  * - current computer and connection lookup time is O(n), which is very slow
