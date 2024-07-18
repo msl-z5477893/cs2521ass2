@@ -5,9 +5,14 @@
  * This implementation can be done on the stack.
  */
 
+#ifndef NetAccess_h_INCLUDED
+#define NetAccess_h_INCLUDED
+
 #include <stdlib.h>
 
+#include "Network.h"
 #include "poodle.h"
+
 struct node {
 	struct node *next;
 	struct computer *comp;
@@ -47,4 +52,6 @@ void NetAccessDeinit(NetAccess na);
  * give the number of computers the provided computer
  * can access.
  */
-int NetAccessInfluence(NetAccess na, int n);
+int NetAccessInfluence(NetAccess na, int n, struct network netData);
+
+#endif
