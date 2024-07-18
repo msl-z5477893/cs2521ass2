@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "Bookmark.h"
 #include "poodle.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -27,6 +28,7 @@ struct probePathResult probePath(struct computer computers[], int numComputers,
                                  int numConnections, int path[],
                                  int pathLength) {
 	struct probePathResult res = {SUCCESS, 0};
+	Bookmark vists = BookmarkInit(numComputers);
 
 	// keep track of the final computer reached.
 	int finalComp = path[0];
@@ -65,8 +67,11 @@ struct probePathResult probePath(struct computer computers[], int numComputers,
 		}
 
 		// if current path is valid then we can count the time to the total
-		res.elapsedTime +=
-		    computers[compFrom].poodleTime + currentConn->transmissionTime;
+		if (BookmarkMark(vists, compFrom)) {
+			// printf("Computer %d marked!\n", compFrom);
+			res.elapsedTime += computers[compFrom].poodleTime;
+		}
+		res.elapsedTime += currentConn->transmissionTime;
 		// printf("CURRENTLY CALCULATED TIME: %d\n", res.elapsedTime);
 
 		finalComp = compTo;
@@ -78,6 +83,7 @@ struct probePathResult probePath(struct computer computers[], int numComputers,
 	// 	res.elapsedTime += computers[path[pathLength - 1]].poodleTime;
 	// }
 	res.elapsedTime += computers[finalComp].poodleTime;
+	BookmarkFree(vists);
 	// printf("ELAPSED TIME: %d\n", res.elapsedTime);
 
 	return res;
