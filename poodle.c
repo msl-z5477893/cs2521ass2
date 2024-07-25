@@ -96,6 +96,10 @@ struct chooseSourceResult chooseSource(struct computer computers[],
                                        int numComputers,
                                        struct connection connections[],
                                        int numConnections) {
+	// NOTE: This structure returns the following
+	// int sourceComputer: number id of computer
+	// int numComputers: number of vulnerable computers
+	// int []computers: id of vulnerable computers.
 	struct chooseSourceResult res = {0, 0, NULL};
 
 	return res;
