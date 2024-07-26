@@ -17,14 +17,19 @@ void IntSetFree(IntSet set) {
 	free(set);
 }
 
-void IntSetAdd(IntSet set, int num) {
+bool IntSetAdd(IntSet set, int num) {
+	if (IntSetHasItem(set, num)) {
+		return false;
+	}
 	int newCount = set->count + 1;
+	// resize array if necessary
 	if (newCount >= set->capacity) {
 		set->capacity *= INTSET_CAPACITY;
 		set->array = realloc(set->array, sizeof(*set->array) * set->capacity);
 	}
 	set->array[set->count] = num;
 	set->count = newCount;
+	return true;
 }
 
 bool IntSetHasItem(IntSet set, int num) {

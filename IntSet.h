@@ -24,12 +24,13 @@ IntSet IntSetNew();
  */
 void IntSetFree(IntSet list);
 
-/* Add item to IntSet
+/* Add item to IntSet.
+ * Returns true if inserted, false otherwise.
  */
-void IntSetAdd(IntSet list, int num);
+bool IntSetAdd(IntSet list, int num);
 
 /* Check if an item exists in IntSet
- * Uses binary search algorithm
+ * Uses binary searching, so set has to be ordered by default.
  */
 bool IntSetHasItem(IntSet list, int num);
 
