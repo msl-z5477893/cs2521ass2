@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "Bookmark.h"
+#include "NetDGraph.h"
 #include "poodle.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -101,6 +102,10 @@ struct chooseSourceResult chooseSource(struct computer computers[],
 	// int numComputers: number of vulnerable computers
 	// int []computers: id of vulnerable computers.
 	struct chooseSourceResult res = {0, 0, NULL};
+
+	NetDGraph dgraph =
+	    NetDGraphGenerate(computers, numComputers, connections, numConnections);
+	NetDGraphFree(dgraph);
 
 	return res;
 }

@@ -32,6 +32,11 @@ bool IntSetAdd(IntSet list, int num);
 /* Check if an item exists in IntSet
  * Uses binary searching, so set has to be ordered by default.
  */
-bool IntSetHasItem(IntSet list, int num);
+bool IntSetQuickCheck(IntSet list, int num);
+
+/* Print the contents of integer set.
+ * For debugging purposes
+ */
+void IntSetDebugPrint(IntSet set);
 
 #endif  // IntSet_h_INCLUDED

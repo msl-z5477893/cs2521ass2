@@ -1,5 +1,6 @@
 // IntPq source file.
 #include "IntPq.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 static struct pqNode *newNode(int num);
@@ -14,15 +15,15 @@ IntPq IntPqNew() {
 
 void IntPqPush(IntPq pq, int num) {
 	struct pqNode *item = newNode(num);
-	int max = pq->tail->num;
-	int min = pq->head->num;
+	// int max = pq->tail->num;
+	// int min = pq->head->num;
 	if (pq->count == 0) {
 		pq->head = item;
 		pq->tail = item;
-	} else if (num < min) {
+	} else if (num < pq->head->num) {
 		item->next = pq->head;
 		pq->head = item;
-	} else if (num > max) {
+	} else if (num > pq->tail->num) {
 		pq->tail->next = item;
 		pq->tail = pq->tail->next;
 	} else {
@@ -58,6 +59,19 @@ void IntPqFree(IntPq pq) {
 		IntPqPop(pq);
 	}
 	free(pq);
+}
+
+void IntPqDebugPrint(IntPq pq) {
+	printf("PQ: ");
+	struct pqNode *curr = pq->head;
+	while (curr != NULL) {
+		printf("%d ", curr->num);
+		if (curr->next != NULL) {
+			printf(" -> ");
+		}
+		curr = curr->next;
+	}
+	printf("\n");
 }
 
 /* Helper function for creating a new IntPq node.

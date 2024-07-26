@@ -44,10 +44,12 @@ NetDGraph NetDGraphGenerate(struct computer computers[], int numComputers,
 
 	// dump queue onto set, set must be in ascending order.
 	for (int currQ = 0; currQ < dg->computers; currQ++) {
+		IntPqDebugPrint(pqEach[currQ]);
 		while (pqEach[currQ]->count != 0) {
 			int addedNum = IntPqPop(pqEach[currQ]);
 			IntSetAdd(dg->adjSet[currQ], addedNum);
 		}
+		IntSetDebugPrint(dg->adjSet[currQ]);
 	}
 
 	// IMPORTANT! Write cleanup code here.

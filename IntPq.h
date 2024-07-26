@@ -37,4 +37,10 @@ void IntPqPush(IntPq pq, int num);
  */
 int IntPqPop(IntPq pq);
 
+/* Show contents of Pq.
+ * For debugging purposes.
+ * Performance: O(n)
+ */
+void IntPqDebugPrint(IntPq pq);
+
 #endif  // IntPq_h_INCLUDED

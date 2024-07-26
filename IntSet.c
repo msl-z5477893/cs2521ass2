@@ -1,9 +1,11 @@
 // set functions go here ig
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "IntSet.h"
+
 IntSet IntSetNew() {
 	IntSet set = malloc(sizeof(*set));
 	set->count = 0;
@@ -18,7 +20,7 @@ void IntSetFree(IntSet set) {
 }
 
 bool IntSetAdd(IntSet set, int num) {
-	if (IntSetHasItem(set, num)) {
+	if (IntSetQuickCheck(set, num)) {
 		return false;
 	}
 	int newCount = set->count + 1;
@@ -32,7 +34,7 @@ bool IntSetAdd(IntSet set, int num) {
 	return true;
 }
 
-bool IntSetHasItem(IntSet set, int num) {
+bool IntSetQuickCheck(IntSet set, int num) {
 	int left = 0;
 	int right = set->capacity - 1;
 	while (left <= right) {
@@ -50,3 +52,12 @@ bool IntSetHasItem(IntSet set, int num) {
 	}
 	return false;
 }
+
+void IntSetDebugPrint(IntSet set) {
+	printf("Integer Set: [");
+	for (int ix = 0; ix < set->count; ix++) {
+		printf("%d%c ", set->array[ix], (ix + 1 < set->count) ? ',' : ']');
+	}
+	printf("\n");
+}
+
