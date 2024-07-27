@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "Bookmark.h"
+#include "DiGraph.h"
 #include "poodle.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,6 +98,9 @@ struct chooseSourceResult chooseSource(struct computer computers[],
                                        struct connection connections[],
                                        int numConnections) {
 	struct chooseSourceResult res = {0, 0, NULL};
+	DiGraph digraph = DiGraphFromNetwork(numComputers, numConnections,
+	                                     computers, connections);
+	DiGraphFree(digraph);
 
 	return res;
 }
@@ -108,7 +112,6 @@ struct poodleResult poodle(struct computer computers[], int numComputers,
                            struct connection connections[], int numConnections,
                            int sourceComputer) {
 	struct poodleResult res = {0, NULL};
-
 	return res;
 }
 
