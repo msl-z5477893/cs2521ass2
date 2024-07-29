@@ -92,17 +92,17 @@ AVLTreeInt AVLTreeIntNew() {
 
 void AVLTreeIntFree(AVLTreeInt tree) {
 	if (tree->root != NULL) {
-		printf("(AVLTreeIntFree()) AVLTreeInt.c line 94: ");
-		printf("Final height: %d, balance %d\n", tree->root->height,
-		       balance(tree->root));
+		// printf("(AVLTreeIntFree()) AVLTreeInt.c line 94: ");
+		// printf("Final height: %d, balance %d\n", tree->root->height,
+		//        balance(tree->root));
 	}
 	struct queue *q = queueInit();
 	queuePush(q, tree->root);
 	while (q->count != 0) {
 		struct intTreeNode *curr = queuePop(q);
 		if (curr == NULL) {
-			printf("UNEXPECTED BEHAVIOUR: null pointer in queue\n");
-			printf("Message emitted from line 99.\n");
+			// printf("UNEXPECTED BEHAVIOUR: null pointer in queue\n");
+			// printf("Message emitted from line 99.\n");
 			continue;
 		}
 		if (curr->lesser != NULL) {
@@ -147,12 +147,12 @@ int *AVLTreeIntFlatten(AVLTreeInt tree) {
 	int *results = arrayIntCopy(arr);
 
 	// DEBUG CODE
-	printf("(AVLTreeIntFlatten()) AVLTreeInt.c line 145: ");
-	printf("Returned list: [");
-	for (int ix = 0; ix < arr->capacity; ix++) {
-		printf(" %d%c", results[ix], (ix + 1 < arr->capacity) ? ',' : ']');
-	}
-	printf("\n");
+	// printf("(AVLTreeIntFlatten()) AVLTreeInt.c line 145: ");
+	// printf("Returned list: [");
+	// for (int ix = 0; ix < arr->capacity; ix++) {
+	// 	printf(" %d%c", results[ix], (ix + 1 < arr->capacity) ? ',' : ']');
+	// }
+	// printf("\n");
 	arrayIntFree(arr);
 	return results;
 }

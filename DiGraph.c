@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "AVLTreeInt.h"
+#include "StackInt.h"
 
 /* check for accessibility between computers for one direction.
  */
@@ -18,6 +19,7 @@ DiGraph DiGraphFromNetwork(int numComputers, int numConnections,
 	DiGraph dgraph = malloc(sizeof(*dgraph));
 	dgraph->vertices = numComputers;
 	dgraph->adjacency = malloc(sizeof(*dgraph->adjacency) * dgraph->vertices);
+	dgraph->adjCount = malloc(sizeof(*dgraph->adjCount) * dgraph->vertices);
 	// TODO: loop through network data and build adjacency list.
 
 	AVLTreeInt *adjTrees = malloc(sizeof(**adjTrees) * dgraph->vertices);
@@ -59,6 +61,7 @@ DiGraph DiGraphFromNetwork(int numComputers, int numConnections,
 	// turn each tree into list then delete each
 	for (int tree = 0; tree < dgraph->vertices; tree++) {
 		dgraph->adjacency[tree] = AVLTreeIntFlatten(adjTrees[tree]);
+		dgraph->adjCount[tree] = adjTrees[tree]->count;
 		AVLTreeIntFree(adjTrees[tree]);
 	}
 	free(adjTrees);
@@ -73,6 +76,16 @@ void DiGraphFree(DiGraph dg) {
 	free(dg->adjacency);
 	free(dg);
 }
+
+struct nodeReachability *DiGraphNodeReachability(int nodeId) {
+	AVLTreeInt visited = AVLTreeIntNew();
+	StackInt stack = StackIntNew();
+	StackIntPush(stack, nodeId);
+	while (stack->count != 0) {}
+	return NULL;
+}
+
+// LOCAL FUNCTIONS
 
 static bool directionalAccess(int securityFrom, int securityTo) {
 	return !(securityTo > securityFrom + 1);
