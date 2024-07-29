@@ -14,6 +14,7 @@ struct digraph {
 struct nodeReachability {
 	int nodeSrc;
 	int *nodeAccessible;
+	int accessCount;
 };
 
 typedef struct digraph *DiGraph;
@@ -32,7 +33,7 @@ DiGraph DiGraphFromNetwork(int numComputers, int numConnections,
 /* from a node with ID n return an array of nodes with id n that
  * are accessible from source node and the number of these
  */
-struct nodeReachability *DiGraphNodeReachability(int nodeId);
+struct nodeReachability *DiGraphNodeReachability(DiGraph graph, int nodeId);
 
 void DiGraphFree(DiGraph dgraph);
 

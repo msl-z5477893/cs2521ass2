@@ -74,15 +74,35 @@ void DiGraphFree(DiGraph dg) {
 		free(dg->adjacency[adjIx]);
 	}
 	free(dg->adjacency);
+	free(dg->adjCount);
 	free(dg);
 }
 
-struct nodeReachability *DiGraphNodeReachability(int nodeId) {
+struct nodeReachability *DiGraphNodeReachability(DiGraph graph, int nodeId) {
 	AVLTreeInt visited = AVLTreeIntNew();
 	StackInt stack = StackIntNew();
+
+	// mark initial nodeId as visited
 	StackIntPush(stack, nodeId);
-	while (stack->count != 0) {}
-	return NULL;
+	AVLTreeIntInsert(visited, nodeId);
+	while (stack->count != 0) {
+		int currNode = StackIntPop(stack);
+		for (int adjIx = 0; adjIx < graph->adjCount[currNode]; adjIx++) {
+			// if tree insertion is successful that means the node is newly visited
+			// and we should check adjacencies for more accessible neighbours
+			if (AVLTreeIntInsert(visited, graph->adjacency[currNode][adjIx])) {
+				StackIntPush(stack, graph->adjacency[currNode][adjIx]);
+			}
+		}
+	}
+
+	struct nodeReachability *reachables = malloc(sizeof(*reachables));
+	reachables->nodeSrc = nodeId;
+	reachables->accessCount = visited->count;
+	reachables->nodeAccessible = AVLTreeIntFlatten(visited);
+	AVLTreeIntFree(visited);
+	StackIntFree(stack);
+	return reachables;
 }
 
 // LOCAL FUNCTIONS

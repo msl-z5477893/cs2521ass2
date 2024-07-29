@@ -100,6 +100,18 @@ struct chooseSourceResult chooseSource(struct computer computers[],
 	struct chooseSourceResult res = {0, 0, NULL};
 	DiGraph digraph = DiGraphFromNetwork(numComputers, numConnections,
 	                                     computers, connections);
+
+	for (int i = 0; i < digraph->vertices; i++) {
+		struct nodeReachability *r = DiGraphNodeReachability(digraph, i);
+		// DEBUG CODE:
+		printf("Computers accessible from computer %d: ", r->nodeSrc);
+		for (int comp = 0; comp < r->accessCount; comp++) {
+			printf("%d ", r->nodeAccessible[comp]);
+		}
+		printf("\n");
+		free(r->nodeAccessible);
+		free(r);
+	}
 	DiGraphFree(digraph);
 
 	return res;
@@ -128,7 +140,5 @@ struct poodleResult advancedPoodle(struct computer computers[],
                                    struct connection connections[],
                                    int numConnections, int sourceComputer) {
 	struct poodleResult res = {0, NULL};
-
 	return res;
 }
-

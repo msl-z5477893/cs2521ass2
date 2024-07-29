@@ -46,7 +46,7 @@ static int insertFromRoot(struct intTreeNode *root, struct intTreeNode *node);
 
 /* get the difference between lesser and greater subtrees.
  */
-static int balance(struct intTreeNode *root);
+// static int balance(struct intTreeNode *root);
 
 /* inOrder traversal of a tree
  */
@@ -206,14 +206,14 @@ static int insertFromRoot(struct intTreeNode *root, struct intTreeNode *node) {
 	return -1;
 }
 
-static int balance(struct intTreeNode *root) {
-	if (root->lesser == NULL && root->greater == NULL) {
-		return 0;
-	} else if (root->lesser == NULL || root->greater == NULL) {
-		return root->height;
-	}
-	return abs(root->lesser->height - root->greater->height);
-}
+// static int balance(struct intTreeNode *root) {
+// 	if (root->lesser == NULL && root->greater == NULL) {
+// 		return 0;
+// 	} else if (root->lesser == NULL || root->greater == NULL) {
+// 		return root->height;
+// 	}
+// 	return abs(root->lesser->height - root->greater->height);
+// }
 
 static void inorderAVL(struct intTreeNode *node, struct arrayInt *arr) {
 	if (node == NULL) {

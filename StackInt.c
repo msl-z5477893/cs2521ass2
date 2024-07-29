@@ -12,9 +12,10 @@ StackInt StackIntNew() {
 
 void StackIntPush(StackInt stack, int num) {
 	struct stackNodeInt *new = newNode(num);
-	if (stack->count == 0) {
-		new->next = stack->head;
-	}
+	// if (stack->count == 0) {
+	// 	new->next = stack->head;
+	// }
+	new->next = stack->head;
 	stack->head = new;
 	stack->count++;
 }
