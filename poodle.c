@@ -11,6 +11,9 @@
 #include "DiGraph.h"
 #include "poodle.h"
 
+// LOCAL FUNCTIONS.
+static int *copyArrayInt(int *arr, int arrSize);
+
 ////////////////////////////////////////////////////////////////////////
 // Task 1
 
@@ -104,11 +107,21 @@ struct chooseSourceResult chooseSource(struct computer computers[],
 	for (int i = 0; i < digraph->vertices; i++) {
 		struct nodeReachability *r = DiGraphNodeReachability(digraph, i);
 		// DEBUG CODE:
-		printf("Computers accessible from computer %d: ", r->nodeSrc);
-		for (int comp = 0; comp < r->accessCount; comp++) {
-			printf("%d ", r->nodeAccessible[comp]);
+		// printf("Computers accessible from computer %d: ", r->nodeSrc);
+		// for (int comp = 0; comp < r->accessCount; comp++) {
+		// 	printf("%d ", r->nodeAccessible[comp]);
+		// }
+		// printf("\n");
+		if (r->accessCount > res.numComputers) {
+			res.numComputers = r->accessCount;
+			res.sourceComputer = r->nodeSrc;
+			if (res.computers != NULL) {
+				int *memDump = res.computers;
+				res.computers = NULL;
+				free(memDump);
+			}
+			res.computers = copyArrayInt(r->nodeAccessible, r->accessCount);
 		}
-		printf("\n");
 		free(r->nodeAccessible);
 		free(r);
 	}
@@ -141,4 +154,15 @@ struct poodleResult advancedPoodle(struct computer computers[],
                                    int numConnections, int sourceComputer) {
 	struct poodleResult res = {0, NULL};
 	return res;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Local functions.
+
+static int *copyArrayInt(int *arr, int arrSize) {
+	int *newArr = malloc(sizeof(*newArr) * arrSize);
+	for (int ix = 0; ix < arrSize; ix++) {
+		newArr[ix] = arr[ix];
+	}
+	return newArr;
 }
