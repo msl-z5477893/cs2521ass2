@@ -3,10 +3,12 @@
 #include "Fullgraph.h"
 #include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
+#define INF 2147483647
+
 static bool directionalAccess(int securityFrom, int securityTo);
-static int *trimZero(int *arrayInit, int arraySize);
 
 Fullgraph FullgraphGenerate(int numComps, int numConns, struct computer comps[],
                             struct connection conns[]) {
@@ -61,24 +63,23 @@ void FullgraphFree(Fullgraph graph) {
 	free(graph);
 }
 
-static int *trimZero(int *arrayInit, int arraySize) {
-	int newArraySize = 0;
-	for (int ix = 0; ix < arraySize; ix++) {
-		if (arrayInit[ix] != 0) {
-			newArraySize++;
-		}
+// TODO: incomplete
+struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
+	struct djikstraData *data = malloc(sizeof(*data));
+	data->vertices = g->vertices;
+	data->visits = 0;
+	data->distance = malloc(sizeof(*data->distance) * data->vertices);
+	data->predecessor = malloc(sizeof(*data->distance) * data->vertices);
+	for (int ix = 0; ix < data->vertices; ix++) {
+		data->predecessor[ix] = -1;
+		data->distance[ix] = INF;
 	}
 
-	int *newArray = malloc(*newArray * newArraySize);
-	int newArrCount = 0;
-	for (int newIx = 0; newIx < arraySize; newIx++) {
-		if (newArraySize < 0) {
-			newArray[newArrCount] = arrayInit[newIx];
-			newArrCount++;
-		}
-	}
-	free(arrayInit);
-	return newArray;
+	data->distance[vertexSrc] = 0;
+
+	printf("WARNING: used function FullgraphDjikstra() in Fullgraph.c is "
+	       "incomplete.\n");
+	return data;
 }
 
 static bool directionalAccess(int securityFrom, int securityTo) {

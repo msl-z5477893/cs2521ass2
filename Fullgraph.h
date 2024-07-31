@@ -4,6 +4,8 @@
 #ifndef Fullgraph_h_INCLUDED
 #define Fullgraph_h_INCLUDED
 
+#include <stdbool.h>
+
 #include "poodle.h"
 
 struct graph {
@@ -11,6 +13,13 @@ struct graph {
 	int *vertexCost;
 	int **edges;
 	int *edgeCount;
+};
+
+struct djikstraData {
+	int vertices;
+	int visits;
+	int *distance;
+	int *predecessor;
 };
 
 typedef struct graph *Fullgraph;
@@ -24,5 +33,6 @@ Fullgraph FullgraphGenerate(int numComps, int numConns, struct computer comps[],
 void FullgraphFree(Fullgraph graph);
 
 // struct step *FullgraphTraverse();
+struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc);
 
 #endif  // Fullgraph_h_INCLUDED
