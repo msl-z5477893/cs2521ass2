@@ -8,7 +8,6 @@
 
 #include "Bookmark.h"
 #include "PqNeighbours.h"
-#include "StackInt.h"
 
 #define INF 2147483647
 
@@ -17,8 +16,7 @@ struct weightedDestEdge {
 	int edgeCost;
 };
 
-struct weightedDestEdge *getEdgesOrdered(int *edgeArray, int arrCount,
-                                         int *newArrCountOut);
+int queueEdgesOfNode(PqNeighbours pq, int *edgeArray, int arraySize);
 static bool directionalAccess(int securityFrom, int securityTo);
 
 Fullgraph FullgraphGenerate(int numComps, int numConns, struct computer comps[],
@@ -101,10 +99,10 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		struct neighbourPath currNode = PqNeighboursPop(pqueue);
 		int currVtx = currNode.vertexTo;
 		int currDist = currNode.cost;
+		int nodeCost = g->vertexCost[currVtx];
 		BookmarkMark(visited, currVtx);
-		int edgesLiveNum = 0;
-		struct weightedDestEdge *liveEdges =
-		    getEdgesOrdered(g->edges[currVtx], g->vertices, &edgesLiveNum);
+		// struct weightedDestEdge *liveEdges =
+		//     getEdgesOrdered(g->edges[currVtx], g->vertices, &edgesLiveNum);
 		/* FIXME: too much nesting
                  * this error may cause major marking penalties
                  */
@@ -134,22 +132,3 @@ static bool directionalAccess(int securityFrom, int securityTo) {
 	return !(securityTo > securityFrom + 1);
 }
 
-struct weightedDestEdge *getEdgesOrdered(int *edgeArray, int arrCount,
-                                         int *newArrCountOut) {
-	PqNeighbours pq = PqNeighboursNew();
-	*newArrCountOut = 0;
-	for (int ix = 0; ix < arrCount; ix++) {
-		if (edgeArray[ix] != 0) {
-			PqNeighboursPush(pq, ix, edgeArray[ix]);
-			(*newArrCountOut)++;
-		}
-	}
-	struct weightedDestEdge *edges = malloc(sizeof(*edges) * (*newArrCountOut));
-	for (int ix = 0; ix < *newArrCountOut; ix++) {
-		struct neighbourPath path = PqNeighboursPop(pq);
-		edges[ix].dest = path.vertexTo;
-		edges[ix].edgeCost = path.cost;
-	}
-	PqNeighboursFree(pq);
-	return edges;
-}
