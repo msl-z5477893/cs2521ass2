@@ -9,6 +9,7 @@
 
 #include "Bookmark.h"
 #include "DiGraph.h"
+#include "Fullgraph.h"
 #include "poodle.h"
 
 // LOCAL FUNCTIONS.
@@ -137,6 +138,12 @@ struct poodleResult poodle(struct computer computers[], int numComputers,
                            struct connection connections[], int numConnections,
                            int sourceComputer) {
 	struct poodleResult res = {0, NULL};
+
+	Fullgraph graph =
+	    FullgraphGenerate(numComputers, numConnections, computers, connections);
+	struct djikstraData *travData = FullgraphDjikstra(graph, sourceComputer);
+	free(travData);
+	FullgraphFree(graph);
 	return res;
 }
 

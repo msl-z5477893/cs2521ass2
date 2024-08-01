@@ -51,8 +51,9 @@ struct neighbourPath PqNeighboursPop(PqNeighbours pq) {
 	struct neighbourPath *pop = pq->head;
 	struct neighbourPath res = {
 	    .cost = pop->cost, .next = NULL, .vertexTo = pop->vertexTo};
-	free(pop);
+	pq->head = pq->head->next;
 	pq->count--;
+	free(pop);
 	return res;
 }
 

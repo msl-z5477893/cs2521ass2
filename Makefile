@@ -3,7 +3,7 @@
 # List all your supporting .c files here. Do NOT include .h files in this list.
 # Example: SUPPORTING_FILES = hello.c world.c
 
-SUPPORTING_FILES = Bookmark.c AVLTreeInt.c DiGraph.c StackInt.c
+SUPPORTING_FILES = Bookmark.c AVLTreeInt.c DiGraph.c StackInt.c Fullgraph.c PqNeighbours.c
 
 ########################################################################
 # !!! DO NOT MODIFY ANYTHING BELOW THIS LINE !!!
