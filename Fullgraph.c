@@ -77,7 +77,7 @@ void FullgraphFree(Fullgraph graph) {
 	free(graph);
 }
 
-// TODO: incomplete
+// TODO: untested
 struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 	struct djikstraData *data = malloc(sizeof(*data));
 	data->vertices = g->vertices;
@@ -127,10 +127,10 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 				// if (!BookmarkMark(visited, currVtx))
 				// 	newDist += nodeCost;
 
-				printf("Calculate new distance between node %d to node %d: %d "
-				       "+ %d + %d = %d.\n",
-				       currVtx, currentNeighbour, currDist, edgeCost,
-				       nextNodeCost, newDist);
+				// printf("Calculate new distance between node %d to node %d: %d "
+				//        "+ %d + %d = %d.\n",
+				//        currVtx, currentNeighbour, currDist, edgeCost,
+				//        nextNodeCost, newDist);
 				// printf(
 				//     "New recorded distance from source node to node %d: %d.\n",
 				//     currentNeighbour, newDist);
