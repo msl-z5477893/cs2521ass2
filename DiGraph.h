@@ -1,4 +1,5 @@
-/* A digraph for representing the network.
+/* A digraph for a simple, limited representation of a network.
+ * Only shows the connection between nodes.
  */
 #ifndef DiGraph_h_INCLUDED
 #define DiGraph_h_INCLUDED

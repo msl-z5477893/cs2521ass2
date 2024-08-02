@@ -3,7 +3,6 @@
 #include "Fullgraph.h"
 #include <assert.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "Bookmark.h"
@@ -77,7 +76,6 @@ void FullgraphFree(Fullgraph graph) {
 	free(graph);
 }
 
-// TODO: untested
 struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 	struct djikstraData *data = malloc(sizeof(*data));
 	data->vertices = g->vertices;
@@ -88,7 +86,6 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		data->predecessor[ix] = -1;
 		data->distance[ix] = INF;
 	}
-	//data->distance[vertexSrc] = 0;
 	// account for source node cost
 	data->distance[vertexSrc] = g->vertexCost[vertexSrc];
 
@@ -100,11 +97,6 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		struct neighbourPath currNode = PqNeighboursPop(pqueue);
 		int currVtx = currNode.vertexTo;
 		int currDist = currNode.cost;
-		// NOTE: adding previous node cost when calculating the closest distance
-		// to the next neighbour causes double counting.
-		// int nodeCost = g->vertexCost[currVtx];
-		// printf("Current node %d has cost %d which is %d units from source.\n",
-		//        currVtx, nodeCost, currDist);
 		BookmarkMark(visited, currVtx);
 
 		int nodeCount = 0;
@@ -116,61 +108,42 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 			if (currentNeighbour == data->predecessor[currVtx]) {
 				continue;
 			}
-			// int edgeCost = neighbours[nbIx].edgeCost;
 			int edgeCost = g->edges[currVtx][currentNeighbour];
-
 			int nextNodeCost = g->vertexCost[currentNeighbour];
-			// int newDist = edgeCost + currDist;
 			int newDist = currDist + edgeCost + nextNodeCost;
 
 			if (newDist < data->distance[currentNeighbour]) {
-				// if (!BookmarkMark(visited, currVtx))
-				// 	newDist += nodeCost;
-
-				// printf("Calculate new distance between node %d to node %d: %d "
-				//        "+ %d + %d = %d.\n",
-				//        currVtx, currentNeighbour, currDist, edgeCost,
-				//        nextNodeCost, newDist);
-				// printf(
-				//     "New recorded distance from source node to node %d: %d.\n",
-				//     currentNeighbour, newDist);
 				data->distance[currentNeighbour] = newDist;
 				data->predecessor[currentNeighbour] = currVtx;
-				PqNeighboursPush(pqueue, currentNeighbour,
-				                 data->distance[currentNeighbour]);
+				PqNeighboursPush(pqueue, currentNeighbour, newDist);
 			}
 		}
 		free(neighbours);
 	}
 
-	// account for vertexSrc, which will have -1 (no predecessor)
+	// get num of visited nodes accounting for vertexSrc,
+	// which will have -1 (no predecessor)
 	data->visits++;
-	// get num of visited nodes
 	for (int vertex = 0; vertex < data->vertices; vertex++) {
 		if (data->predecessor[vertex] != NO_PREDECESSOR) {
 			data->visits++;
 		}
 	}
 
-	// TODO: write debugging code here
-	// printf("WARNING: used function FullgraphDjikstra() in Fullgraph.c is "
-	//        "potentially buggy.\n");
-	// printf("Results of Djikstra's algorithm: \n");
-	// printf("From source vertex: %d\n", vertexSrc);
-	// for (int ix = 0; ix < data->vertices; ix++) {
-	// 	printf("Node %d -> (distance: %d, predecessor: %d) \n", ix,
-	// 	       data->distance[ix], data->predecessor[ix]);
-	// }
-
 	PqNeighboursFree(pqueue);
 	BookmarkFree(visited);
 	return data;
 }
 
+/* given the security level of one computer or another, evaluate
+ * if there is an open connection (true or false.)
+ */
 static bool directionalAccess(int securityFrom, int securityTo) {
 	return !(securityTo > securityFrom + 1);
 }
 
+/* Given a graph and a chosen vertex, return info of all the neighbours.
+ */
 static struct neighbourData *findNeighbours(Fullgraph graph, int vertexSrc,
                                             int *newArrCountOut) {
 	PqNeighbours pq = PqNeighboursNew();

@@ -32,10 +32,8 @@ Fullgraph FullgraphGenerate(int numComps, int numConns, struct computer comps[],
 /* Free graph */
 void FullgraphFree(Fullgraph graph);
 
-// struct step *FullgraphTraverse();
-
-/* Find the path to every node in graph (if possible) with djikstra algorithm.
- * NOTE: Incomplete
+/* Given the graph and a starting node, ind the path to every node in
+ * graph (if possible) with djikstra algorithm.
  */
 struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc);
 

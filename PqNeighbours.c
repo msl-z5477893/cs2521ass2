@@ -57,6 +57,7 @@ struct neighbourPath PqNeighboursPop(PqNeighbours pq) {
 	return res;
 }
 
+/* node initialisation function */
 static struct neighbourPath *newNode(int vertexTo, int cost) {
 	struct neighbourPath *n = malloc(sizeof(*n));
 	n->cost = cost;

@@ -14,6 +14,7 @@ struct llNodePtr {
 };
 
 /* a queue structure
+ * made specifically for freeing the tree.
  */
 struct queue {
 	int count;
@@ -43,10 +44,6 @@ static struct intTreeNode *newNode(int num);
  * Is called recursively until a space is found.
  */
 static int insertFromRoot(struct intTreeNode *root, struct intTreeNode *node);
-
-/* get the difference between lesser and greater subtrees.
- */
-// static int balance(struct intTreeNode *root);
 
 /* inOrder traversal of a tree
  */
@@ -91,11 +88,6 @@ AVLTreeInt AVLTreeIntNew() {
 }
 
 void AVLTreeIntFree(AVLTreeInt tree) {
-	if (tree->root != NULL) {
-		// printf("(AVLTreeIntFree()) AVLTreeInt.c line 94: ");
-		// printf("Final height: %d, balance %d\n", tree->root->height,
-		//        balance(tree->root));
-	}
 	struct queue *q = queueInit();
 	queuePush(q, tree->root);
 	while (q->count != 0) {
@@ -205,15 +197,6 @@ static int insertFromRoot(struct intTreeNode *root, struct intTreeNode *node) {
 	}
 	return -1;
 }
-
-// static int balance(struct intTreeNode *root) {
-// 	if (root->lesser == NULL && root->greater == NULL) {
-// 		return 0;
-// 	} else if (root->lesser == NULL || root->greater == NULL) {
-// 		return root->height;
-// 	}
-// 	return abs(root->lesser->height - root->greater->height);
-// }
 
 static void inorderAVL(struct intTreeNode *node, struct arrayInt *arr) {
 	if (node == NULL) {

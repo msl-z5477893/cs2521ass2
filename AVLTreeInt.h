@@ -1,7 +1,9 @@
 /* A binary search tree for integers
  * used for faster insertion and lookup.
  *
- * TODO: implement rebalancing algorithm
+ * NOTES: rebalancing method not created,
+ * at this stage this tree is just a normal
+ * binary search tree.
  */
 #ifndef AVLTreeInt_h_INCLUDED
 #define AVLTreeInt_h_INCLUDED
