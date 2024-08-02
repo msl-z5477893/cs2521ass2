@@ -100,32 +100,40 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		struct neighbourPath currNode = PqNeighboursPop(pqueue);
 		int currVtx = currNode.vertexTo;
 		int currDist = currNode.cost;
-		int nodeCost = g->vertexCost[currVtx];
-		printf("Current node %d has cost %d which is %d units from source.\n",
-		       currVtx, nodeCost, currDist);
+		// NOTE: adding previous node cost when calculating the closest distance
+		// to the next neighbour causes double counting.
+		// int nodeCost = g->vertexCost[currVtx];
+		// printf("Current node %d has cost %d which is %d units from source.\n",
+		//        currVtx, nodeCost, currDist);
 		BookmarkMark(visited, currVtx);
 
 		int nodeCount = 0;
 		struct neighbourData *neighbours =
 		    findNeighbours(g, currVtx, &nodeCount);
-		if (nodeCount != g->edgeCount[currVtx]) {
-			printf("WARNING: Node count recorded by findNeighbours() does not "
-			       "match with edge count recorded by graph.\n");
-		}
 		for (int nbIx = 0; nbIx < nodeCount; nbIx++) {
 			int currentNeighbour = neighbours[nbIx].dest;
+			// ignore predecessor
 			if (currentNeighbour == data->predecessor[currVtx]) {
 				continue;
 			}
-			int edgeCost = neighbours[nbIx].edgeCost;
-			int newDist = currDist + nodeCost + edgeCost;
+			// int edgeCost = neighbours[nbIx].edgeCost;
+			int edgeCost = g->edges[currVtx][currentNeighbour];
 
-			// to prevent looking back and scanning where the
-			// algorithm looked before.
+			int nextNodeCost = g->vertexCost[currentNeighbour];
+			// int newDist = edgeCost + currDist;
+			int newDist = currDist + edgeCost + nextNodeCost;
+
 			if (newDist < data->distance[currentNeighbour]) {
-				printf(
-				    "New recorded distance from source node to node %d: %d.\n",
-				    currentNeighbour, newDist);
+				// if (!BookmarkMark(visited, currVtx))
+				// 	newDist += nodeCost;
+
+				printf("Calculate new distance between node %d to node %d: %d "
+				       "+ %d + %d = %d.\n",
+				       currVtx, currentNeighbour, currDist, edgeCost,
+				       nextNodeCost, newDist);
+				// printf(
+				//     "New recorded distance from source node to node %d: %d.\n",
+				//     currentNeighbour, newDist);
 				data->distance[currentNeighbour] = newDist;
 				data->predecessor[currentNeighbour] = currVtx;
 				PqNeighboursPush(pqueue, currentNeighbour,

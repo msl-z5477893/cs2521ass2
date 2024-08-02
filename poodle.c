@@ -57,6 +57,7 @@ struct probePathResult probePath(struct computer computers[], int numComputers,
 			              connections[connIx].computerA == compTo);
 			if (fSide || bSide) {
 				currentConn = &connections[connIx];
+				break;
 			}
 		}
 
