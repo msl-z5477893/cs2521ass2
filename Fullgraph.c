@@ -89,6 +89,7 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		data->distance[ix] = INF;
 	}
 	//data->distance[vertexSrc] = 0;
+	// account for source node cost
 	data->distance[vertexSrc] = g->vertexCost[vertexSrc];
 
 	Bookmark visited = BookmarkInit(data->vertices);
@@ -100,6 +101,8 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		int currVtx = currNode.vertexTo;
 		int currDist = currNode.cost;
 		int nodeCost = g->vertexCost[currVtx];
+		printf("Current node %d has cost %d which is %d units from source.\n",
+		       currVtx, nodeCost, currDist);
 		BookmarkMark(visited, currVtx);
 
 		int nodeCount = 0;
@@ -111,33 +114,25 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		}
 		for (int nbIx = 0; nbIx < nodeCount; nbIx++) {
 			int currentNeighbour = neighbours[nbIx].dest;
-			int edgeCost = neighbours[nbIx].edgeCost;
-			int newDist = edgeCost + currDist + nodeCost;
-			// to prevent looking back and scanning where the
-			// algorithm looked before.
 			if (currentNeighbour == data->predecessor[currVtx]) {
 				continue;
-			} else if (newDist < data->distance[currentNeighbour]) {
+			}
+			int edgeCost = neighbours[nbIx].edgeCost;
+			int newDist = currDist + nodeCost + edgeCost;
+
+			// to prevent looking back and scanning where the
+			// algorithm looked before.
+			if (newDist < data->distance[currentNeighbour]) {
+				printf(
+				    "New recorded distance from source node to node %d: %d.\n",
+				    currentNeighbour, newDist);
 				data->distance[currentNeighbour] = newDist;
 				data->predecessor[currentNeighbour] = currVtx;
-				PqNeighboursPush(pqueue, currentNeighbour, newDist);
+				PqNeighboursPush(pqueue, currentNeighbour,
+				                 data->distance[currentNeighbour]);
 			}
 		}
 		free(neighbours);
-
-		/* FIXME: too much nesting
-                 * this error will cause major marking penalties
-                 */
-		// for (int edgesIx = 0; edgesIx < g->edgeCount[currVtx];) {
-		// 	if (g->edges[currVtx][edgesIx] > 0) {
-		// 		int newDist = g->edges[currVtx][edgesIx] + currDist;
-		// 		if (newDist < data->distance[edgesIx]) {
-		// 			data->distance[edgesIx] = newDist;
-		// 			data->predecessor[edgesIx] = currVtx;
-		// 			PqNeighboursPush(pqueue, edgesIx, newDist);
-		// 		}
-		// 	}
-		// }
 	}
 
 	// account for vertexSrc, which will have -1 (no predecessor)
@@ -149,16 +144,15 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		}
 	}
 
-	printf("WARNING: used function FullgraphDjikstra() in Fullgraph.c is "
-	       "potentially buggy.\n");
-
 	// TODO: write debugging code here
-	printf("Results of Djikstra's algorithm: \n");
-	printf("From source vertex: %d\n", vertexSrc);
-	for (int ix = 0; ix < data->vertices; ix++) {
-		printf("Node %d -> (distance: %d, predecessor: %d) \n", ix,
-		       data->distance[ix], data->predecessor[ix]);
-	}
+	// printf("WARNING: used function FullgraphDjikstra() in Fullgraph.c is "
+	//        "potentially buggy.\n");
+	// printf("Results of Djikstra's algorithm: \n");
+	// printf("From source vertex: %d\n", vertexSrc);
+	// for (int ix = 0; ix < data->vertices; ix++) {
+	// 	printf("Node %d -> (distance: %d, predecessor: %d) \n", ix,
+	// 	       data->distance[ix], data->predecessor[ix]);
+	// }
 
 	PqNeighboursFree(pqueue);
 	BookmarkFree(visited);
@@ -179,7 +173,6 @@ static struct neighbourData *findNeighbours(Fullgraph graph, int vertexSrc,
 			(*newArrCountOut)++;
 		}
 	}
-	// NOTE: Stack buffer overflow error occurs here.
 	struct neighbourData *resultPtr =
 	    malloc(sizeof(struct neighbourData) * (*newArrCountOut));
 	for (int ix = 0; ix < *newArrCountOut; ix++) {
