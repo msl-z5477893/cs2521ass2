@@ -9,15 +9,16 @@
 #include "Bookmark.h"
 #include "PqNeighbours.h"
 
-#define INF 2147483647
+#define INF            2147483647
+#define NO_PREDECESSOR -1
 
 struct neighbourData {
 	int dest;
 	int edgeCost;
 };
 
-static int findNeighbours(Fullgraph g, int vertexSrc,
-                          struct neighbourData **resultPtr);
+static struct neighbourData *findNeighbours(Fullgraph g, int vertexSrc,
+                                            int *newArrCountOut);
 
 static bool directionalAccess(int securityFrom, int securityTo);
 
@@ -80,14 +81,15 @@ void FullgraphFree(Fullgraph graph) {
 struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 	struct djikstraData *data = malloc(sizeof(*data));
 	data->vertices = g->vertices;
-	data->visits = 0;
 	data->distance = malloc(sizeof(*data->distance) * data->vertices);
 	data->predecessor = malloc(sizeof(*data->distance) * data->vertices);
+	data->visits = 0;
 	for (int ix = 0; ix < data->vertices; ix++) {
 		data->predecessor[ix] = -1;
 		data->distance[ix] = INF;
 	}
-	data->distance[vertexSrc] = 0;
+	//data->distance[vertexSrc] = 0;
+	data->distance[vertexSrc] = g->vertexCost[vertexSrc];
 
 	Bookmark visited = BookmarkInit(data->vertices);
 	PqNeighbours pqueue = PqNeighboursNew();
@@ -97,26 +99,31 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		struct neighbourPath currNode = PqNeighboursPop(pqueue);
 		int currVtx = currNode.vertexTo;
 		int currDist = currNode.cost;
-		// int nodeCost = g->vertexCost[currVtx];
+		int nodeCost = g->vertexCost[currVtx];
 		BookmarkMark(visited, currVtx);
 
-		struct neighbourData *neighbours = NULL;
-		int nodeCount = findNeighbours(g, currVtx, &neighbours);
+		int nodeCount = 0;
+		struct neighbourData *neighbours =
+		    findNeighbours(g, currVtx, &nodeCount);
+		if (nodeCount != g->edgeCount[currVtx]) {
+			printf("WARNING: Node count recorded by findNeighbours() does not "
+			       "match with edge count recorded by graph.\n");
+		}
 		for (int nbIx = 0; nbIx < nodeCount; nbIx++) {
 			int currentNeighbour = neighbours[nbIx].dest;
 			int edgeCost = neighbours[nbIx].edgeCost;
-			int newDist = edgeCost + currDist;
+			int newDist = edgeCost + currDist + nodeCost;
 			// to prevent looking back and scanning where the
 			// algorithm looked before.
 			if (currentNeighbour == data->predecessor[currVtx]) {
 				continue;
-			}
-			if (newDist < data->distance[nbIx]) {
-				data->distance[nbIx] = newDist;
-				data->predecessor[nbIx] = currVtx;
-				PqNeighboursPush(pqueue, nbIx, newDist);
+			} else if (newDist < data->distance[currentNeighbour]) {
+				data->distance[currentNeighbour] = newDist;
+				data->predecessor[currentNeighbour] = currVtx;
+				PqNeighboursPush(pqueue, currentNeighbour, newDist);
 			}
 		}
+		free(neighbours);
 
 		/* FIXME: too much nesting
                  * this error will cause major marking penalties
@@ -133,12 +140,21 @@ struct djikstraData *FullgraphDjikstra(Fullgraph g, int vertexSrc) {
 		// }
 	}
 
+	// account for vertexSrc, which will have -1 (no predecessor)
+	data->visits++;
+	// get num of visited nodes
+	for (int vertex = 0; vertex < data->vertices; vertex++) {
+		if (data->predecessor[vertex] != NO_PREDECESSOR) {
+			data->visits++;
+		}
+	}
+
 	printf("WARNING: used function FullgraphDjikstra() in Fullgraph.c is "
 	       "potentially buggy.\n");
 
 	// TODO: write debugging code here
 	printf("Results of Djikstra's algorithm: \n");
-	printf("From source vertex: %d", vertexSrc);
+	printf("From source vertex: %d\n", vertexSrc);
 	for (int ix = 0; ix < data->vertices; ix++) {
 		printf("Node %d -> (distance: %d, predecessor: %d) \n", ix,
 		       data->distance[ix], data->predecessor[ix]);
@@ -153,23 +169,24 @@ static bool directionalAccess(int securityFrom, int securityTo) {
 	return !(securityTo > securityFrom + 1);
 }
 
-static int findNeighbours(Fullgraph graph, int vertexSrc,
-                          struct neighbourData **resultPtr) {
+static struct neighbourData *findNeighbours(Fullgraph graph, int vertexSrc,
+                                            int *newArrCountOut) {
 	PqNeighbours pq = PqNeighboursNew();
-	int newArrCountOut = 0;
+	*newArrCountOut = 0;
 	for (int ix = 0; ix < graph->vertices; ix++) {
 		if (graph->edges[vertexSrc][ix] != 0) {
 			PqNeighboursPush(pq, ix, graph->edges[vertexSrc][ix]);
-			newArrCountOut++;
+			(*newArrCountOut)++;
 		}
 	}
 	// NOTE: Stack buffer overflow error occurs here.
-	*resultPtr = malloc(sizeof(struct neighbourData) * newArrCountOut);
-	for (int ix = 0; ix < newArrCountOut; ix++) {
+	struct neighbourData *resultPtr =
+	    malloc(sizeof(struct neighbourData) * (*newArrCountOut));
+	for (int ix = 0; ix < *newArrCountOut; ix++) {
 		struct neighbourPath path = PqNeighboursPop(pq);
-		resultPtr[ix]->dest = path.vertexTo;
-		resultPtr[ix]->edgeCost = path.cost;
+		resultPtr[ix].dest = path.vertexTo;
+		resultPtr[ix].edgeCost = path.cost;
 	}
 	PqNeighboursFree(pq);
-	return newArrCountOut;
+	return resultPtr;
 }

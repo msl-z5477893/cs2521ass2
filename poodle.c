@@ -10,10 +10,15 @@
 #include "Bookmark.h"
 #include "DiGraph.h"
 #include "Fullgraph.h"
+#include "PqNeighbours.h"
 #include "poodle.h"
 
 // LOCAL FUNCTIONS.
 static int *copyArrayInt(int *arr, int arrSize);
+static struct step *processDjikstraData(struct djikstraData *data);
+
+static struct computerList *addComputer(struct computerList *list,
+                                        int computer);
 
 ////////////////////////////////////////////////////////////////////////
 // Task 1
@@ -82,11 +87,6 @@ struct probePathResult probePath(struct computer computers[], int numComputers,
 		finalComp = compTo;
 	}
 
-	// if we didn't encounter issues the entire probe, account the poodle time of
-	// final destination
-	// if (res.status == SUCCESS) {
-	// 	res.elapsedTime += computers[path[pathLength - 1]].poodleTime;
-	// }
 	res.elapsedTime += computers[finalComp].poodleTime;
 	BookmarkFree(vists);
 	// printf("ELAPSED TIME: %d\n", res.elapsedTime);
@@ -142,6 +142,12 @@ struct poodleResult poodle(struct computer computers[], int numComputers,
 	Fullgraph graph =
 	    FullgraphGenerate(numComputers, numConnections, computers, connections);
 	struct djikstraData *travData = FullgraphDjikstra(graph, sourceComputer);
+	res.numSteps = travData->visits;
+	res.steps = processDjikstraData(travData);
+
+	// free data
+	free(travData->distance);
+	free(travData->predecessor);
 	free(travData);
 	FullgraphFree(graph);
 	return res;
@@ -172,4 +178,59 @@ static int *copyArrayInt(int *arr, int arrSize) {
 		newArr[ix] = arr[ix];
 	}
 	return newArr;
+}
+
+static struct step *processDjikstraData(struct djikstraData *data) {
+	struct step *steps = malloc(sizeof(*steps) * data->visits);
+	PqNeighbours pq = PqNeighboursNew();
+
+	for (int vertexIx = 0; vertexIx < data->vertices; vertexIx++) {
+		if (data->distance[vertexIx] == INFINITY) {
+			// vertexIx--;
+			continue;
+		}
+		PqNeighboursPush(pq, vertexIx, data->distance[vertexIx]);
+	}
+
+	// assigning computers and poodle time
+	for (int step = 0; step < data->visits; step++) {
+		if (pq->count == 0) {
+			printf("Warning: poodle.c 197, priority queue ran out before step "
+			       "reached visited.\n");
+			break;
+		}
+		struct neighbourPath newStep = PqNeighboursPop(pq);
+		steps[step].time = newStep.cost;
+		steps[step].computer = newStep.vertexTo;
+		steps[step].recipients = NULL;
+	}
+
+	// assigning recipients for each computers
+	for (int step = 0; step < data->visits; step++) {
+		int predecessor = steps[step].computer;
+		for (int vertex = 0; vertex < data->vertices; vertex++) {
+			if (data->predecessor[vertex] == predecessor) {
+				steps[step].recipients =
+				    addComputer(steps[step].recipients, vertex);
+			}
+		}
+	}
+
+	PqNeighboursFree(pq);
+	return steps;
+}
+
+static struct computerList *addComputer(struct computerList *list,
+                                        int computer) {
+	// base case
+	if (list == NULL) {
+		struct computerList *newNode = malloc(sizeof(*newNode));
+		newNode->next = NULL;
+		newNode->computer = computer;
+		return newNode;
+	}
+
+	// recursive case
+	list->next = addComputer(list->next, computer);
+	return list;
 }
